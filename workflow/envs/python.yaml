@@ -1,0 +1,8 @@
+# Python scripts run by the workflow rules (tensorQTL has its own env: tensorqtl.yaml)
+channels: [conda-forge]
+dependencies:
+  - python=3.11
+  - pandas=2.2
+  - numpy=1.26
+  - scipy=1.13
+  - pyarrow

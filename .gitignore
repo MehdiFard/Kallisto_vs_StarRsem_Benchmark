@@ -1,0 +1,41 @@
+# ---- local site-specific copies (cluster account/partitions, paths, containers), not shared
+*_lab*
+CLAUDE.md
+
+# ---- inputs, generated outputs and run state
+data/*
+!data/README.md
+!data/metadata/
+# folders kept with a README note, contents not tracked
+resources/*/*
+!resources/*/README.md
+logs/*
+!logs/README.md
+# SLURM does not create the --output folder of run_pipeline.slurm, so keep it in git
+!logs/slurm/
+logs/slurm/*
+!logs/slurm/.gitkeep
+benchmarks/
+.snakemake/
+
+# ---- results: folder structure kept (one empty .gitkeep per folder), contents not tracked
+results/*
+!results/README.md
+!results/*/
+results/*/*
+!results/*/.gitkeep
+# report: only the figure script and the PNG figures are tracked
+!results/report/make_figures.py
+!results/report/figures/
+results/report/figures/*
+!results/report/figures/*.png
+
+# ---- misc
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.vscode/
+.idea/
+.DS_Store
+*.sif
+node_modules/

@@ -1,0 +1,16 @@
+# tensorQTL on GPU. torch 2.3.1 from PyPI ships CUDA 12.1.
+channels: [conda-forge, bioconda]
+dependencies:
+  - python=3.11
+  - pandas=2.2
+  - numpy=1.26
+  - scipy=1.13
+  - pyarrow
+  - rpy2
+  - r-base
+  - bioconductor-qvalue
+  - pip
+  - pip:
+      - torch==2.3.1
+      - Pgenlib==0.93.0
+      - tensorqtl==1.0.10

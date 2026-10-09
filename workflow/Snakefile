@@ -1,0 +1,77 @@
+"""kallisto vs STAR+RSEM benchmark on Geuvadis: raw FASTQ -> quantification -> cis-eQTL.
+
+Run from the project root:  snakemake --profile profiles/slurm
+Targets: all (default), quant (quantification + comparison tables only; used for the pilot), trans (optional)
+"""
+import pandas as pd
+
+
+configfile: "config/config.yaml"
+
+
+SAMPLES_DF = pd.read_csv(config["samples"], sep="\t", dtype=str)
+SAMPLES = SAMPLES_DF["sample_id"].tolist()
+RUNS = dict(zip(SAMPLES_DF["sample_id"], SAMPLES_DF["runs"].str.split(",")))
+CHROMS = [str(c) for c in config["chromosomes"]]
+TOOLS = ["rsem", "kallisto"]
+LEVELS = ["gene", "isoform"]
+
+assert len(SAMPLES) == len(set(SAMPLES)), "duplicated sample_id in samples.tsv"
+assert len(CHROMS) > 1, "plink2 --pmerge-list needs at least two chromosomes"
+
+REF = config["reference"]["name"]
+RSEM_REF = f"resources/rsem/{REF}"
+GENO_PREFIX = "results/genotype/genotypes"
+
+
+wildcard_constraints:
+    sample=r"[A-Za-z0-9]+",
+    run=r"[A-Za-z0-9]+",
+    chrom=r"[0-9XY]+",
+    tool="rsem|kallisto",
+    level="gene|isoform",
+
+
+def keep_or_temp(path, flag):
+    """Mark an output temp() unless the config says to keep it."""
+    return path if config[flag] else temp(path)
+
+
+include: "rules/quantification.smk"
+include: "rules/genotype.smk"
+include: "rules/eqtl.smk"
+
+
+localrules:
+    all,
+    quant,
+    trans,
+    genotype_sample_list,
+    index_phenotype_bed,
+
+
+rule all:
+    input:
+        expand("results/eqtl/{tool}/{level}/cis.tsv.gz", tool=TOOLS, level=LEVELS),
+        expand("results/eqtl/{tool}/{level}/cis_independent.tsv.gz", tool=TOOLS, level=LEVELS),
+        expand("results/eqtl/{tool}/{level}/cis_signif_pairs.tsv.gz", tool=TOOLS, level=LEVELS),
+        "results/summary/mapping_qc.tsv",
+        "results/summary/compute_benchmark.tsv",
+        expand("results/summary/quant_correlation_{level}_per_sample.tsv", level=LEVELS),
+        expand("results/summary/quant_correlation_{level}_per_feature.tsv.gz", level=LEVELS),
+        "results/summary/eqtl_summary.tsv",
+
+
+rule quant:
+    """Quantification and comparison tables only, no genotypes / eQTL (snakemake ... quant)."""
+    input:
+        "results/summary/mapping_qc.tsv",
+        "results/summary/compute_benchmark.tsv",
+        expand("results/summary/quant_correlation_{level}_per_sample.tsv", level=LEVELS),
+        expand("results/summary/quant_correlation_{level}_per_feature.tsv.gz", level=LEVELS),
+
+
+rule trans:
+    """Optional: trans-eQTL mapping for all phenotype sets (snakemake ... trans)."""
+    input:
+        expand("results/eqtl/{tool}/{level}/trans.tsv.gz", tool=TOOLS, level=LEVELS),
