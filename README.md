@@ -76,6 +76,7 @@ Tools: STAR 2.7.10b, RSEM 1.3.3, kallisto 0.51.1, plink2, tensorQTL 1.0.10.
 ## Author
 
 Mehdi Esmaeili-Fard (mehdi.esmaeilifard@gmail.com).
+
 Completion date: February 2024.
 
 ## License
