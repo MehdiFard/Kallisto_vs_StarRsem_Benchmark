@@ -66,7 +66,7 @@ mamba create -n snakemake -c conda-forge -c bioconda snakemake snakemake-executo
 
 ```bash
 sbatch run_pipeline.slurm                                    # full pipeline
-sbatch --export=ALL,TARGET=quant,SNAKEMAKE_ARGS="--config samples=config/samples_pilot.tsv" run_pipeline.slurm   # 2-sample pilot
+sbatch --export=ALL,TARGET=quant,SNAKEMAKE_ARGS="--config samples=config/samples_pilot.tsv" run_pipeline.slurm   # 2-sample pilot (HG00096 (one sequencing run) and HG00099 (two runs))
 sbatch --export=ALL,TARGET=trans run_pipeline.slurm          # optional trans-eQTL
 sbatch --export=ALL,UNLOCK=1 run_pipeline.slurm              # restart after a killed controller job
 ```
